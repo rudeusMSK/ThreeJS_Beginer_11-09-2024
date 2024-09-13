@@ -9,7 +9,6 @@ function App() {
   return (
     <>
       <div>
-        d
       </div>
       <span className="pt-5"></span>
     </>
