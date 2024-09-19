@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>GoJo Box</title>
+    <style>
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <audio id="background-audio" style="display: none;" autoplay muted loop>
+        <source src="./src/assets/audio/theme.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        document.body.addEventListener('click', function enableAudio() {
+            var audio = document.getElementById('background-audio');
+            audio.muted = false; // Bật âm thanh
+            audio.play();
+            // ngừng để không lặp lại nhiều lần
+            document.body.removeEventListener('click', enableAudio);
+        });
+    </script>
+    <script type="module" src="./src/GoJo.js"></script>
+</body>
+</html>
