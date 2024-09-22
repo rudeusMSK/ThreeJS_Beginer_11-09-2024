@@ -1,81 +1,110 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+// initialize the scene
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight,false );
-document.body.appendChild(renderer.domElement);
-//
-const textreLoader = new THREE.TextureLoader()
+// add objects to the scene
+const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+const cubeMaterial = new THREE.MeshBasicMaterial({color: "red", wireframe: true});
 
-// Get shape:
-// Tạo geometry cho khối hộp
-const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
+const cubeMesh = new THREE.Mesh(
+    cubeGeometry,
+    cubeMaterial
+)
+
+const cubeMesh2 = new THREE.Mesh(
+    cubeGeometry,
+    cubeMaterial
+)
+cubeMesh2.position.x = 2;
+
+const cubeMesh3 = new THREE.Mesh(
+    cubeGeometry,
+    cubeMaterial
+)
+cubeMesh3.position.x = -2;
+
+const group = new THREE.Group();
+group.add(cubeMesh);
+group.add(cubeMesh2);
+group.add(cubeMesh3);
 
 
-const cricleGeometry = new THREE.TetrahedronGeometry(1, 16, 1);
+//scene.add(group)
+scene.add(cubeMesh)
 
-//
-const texture1 = textreLoader.load('./src/assets/DoiTac.png');
-const texture2 = textreLoader.load('./src/assets/DoiTuong2.png');
-const texture3 = textreLoader.load('./src/assets/DoiTuong1.png');
+cubeMesh.rotation.reorder('XYZ')
+cubeMesh.rotation.y = 2;
+cubeMesh.rotation.y = THREE.MathUtils.degToRad(90)
 
-// Get Material
-const box_material = new THREE.MeshBasicMaterial({});
-const boxrotation_material = new THREE.MeshBasicMaterial({ });
-const Cricle_material = new THREE.MeshBasicMaterial({});
 
-            
-box_material.map = texture1
-box_material.needsUpdate = true
-boxrotation_material.map = texture2
-Cricle_material.map = texture3
+cubeMesh.position.y = 1
+cubeMesh.position.z = 1
 
-// Get Green cube and Red cube: 
-const cube = new THREE.Mesh(boxGeometry, box_material);
-const cubeRotation = new THREE.Mesh(boxGeometry, boxrotation_material);
-const cricle = new THREE.Mesh(cricleGeometry, Cricle_material);
+//cubeMesh.scale.y = 2
 
-// setup camera and cube position:
-// box - rotation box - cricle
+//cubeMesh.scale.set(2, 2, 3)
 
-// camera:
-camera.position.z = 7;
-camera.position.y = 3;
+const secneAxesHepler = new THREE.AxesHelper(2);
+const cubeAxesHepler = new THREE.AxesHelper(2);
 
-// shape:
-cubeRotation.position.x = 1.5;
-cricle.position.x =  cube.position.x - 2 ;
+scene.add(secneAxesHepler);
+cubeMesh.add(cubeAxesHepler)
 
-// add shapes to Mesh
-scene.add(cricle, cube, cubeRotation);
+const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    30
+)
 
-// Get axe
-const axesHeplper1 = new THREE.AxesHelper(2);
-const axesHeplper2 = new THREE.AxesHelper(2);
-const axesHeplper3 = new THREE.AxesHelper(2);
 
-//add axe to cube:
-cube.add(axesHeplper1);
-cubeRotation.add(axesHeplper2);
-cricle.add(axesHeplper3);
+camera.position.z = 5
 
-// animations:
-function animate() {
-    cubeRotation.rotation.x += 0.01;
-    cubeRotation.rotation.y += 0.01;
-        cubeRotation.rotation.z += 0.01;
-    renderer.render(scene, camera);
+// initialize the render
+const canvas = document.querySelector("canvas.threejs")
+const render = new THREE.WebGLRenderer({
+    canvas: canvas
+})
+
+ render.setSize(window.innerWidth, window.innerHeight)
+const maxPixelRatio = Math.min(window.devicePixelRatio, 2);
+render.setPixelRatio(maxPixelRatio)
+
+
+// instantiate the controls
+const controls = new OrbitControls(camera, canvas)
+controls.enableDamping = true
+//controls.autoRotate = true
+
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix()
+    render.setSize(window.innerWidth, window.innerHeight)
+})
+
+
+//  initialize the clock
+const clock = new THREE.Clock()
+let previousTime = 0
+
+const renderloop = () => {
+
+    const currentTime = clock.getElapsedTime()
+    const delta = currentTime - previousTime
+    previousTime = currentTime
+
+    cubeMesh.rotation.y += THREE.MathUtils.degToRad(1) * delta * 10
+
+    Math.sin(currentTime)
+   cubeMesh.position.x = (Math.sin(currentTime)) * 3 + 2
+    controls.update(); render.render(scene, camera)
+    window.requestAnimationFrame(renderloop)
 }
 
-// loop:
-renderer.setAnimationLoop(animate);
-
-// camera router:
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.addEventListener( 'change', render); // use if there is no animation loop
+renderloop()
 
 
+
+render.render(scene, camera)
